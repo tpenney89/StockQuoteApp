@@ -29,7 +29,8 @@ jobs:
       MAVEN_OPTS: -Xmx3200m
 
     steps:
-      #- checkout
+      - checkout
+      - run: echo "hello cruel world" # run the `echo` command
       #- run: sudo apt install mysql-client
       #- run:
          # name: install dockerize
@@ -55,4 +56,4 @@ jobs:
        #   key: v1-dependencies-{{ checksum "pom.xml" }}
 
       # run tests!
-      - run: mvn test
+      - run: mvn test -f pom.xml
