@@ -29,6 +29,10 @@ jobs:
       MAVEN_OPTS: -Xmx3200m
 
     steps:
-
-      # run tests!
-      - run: mvn test
+      - checkout # check out the code in the project directory
+      - run: echo "hello cruel world" # run the `echo` command
+      - run: mvn test -f pom.xml
+      - store_test_results:
+          path: target/surefire-reports
+      - store_artifacts:
+          path: target/my-reports
