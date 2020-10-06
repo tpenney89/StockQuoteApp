@@ -1,13 +1,23 @@
-version: 2.1
+# Java Maven CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-java/ for more details
+#
+version: 2
 jobs:
   build:
     docker:
-      - image: 'circleci/openjdk:latest' # the primary container, where your job's commands are run
-      
-      - image: circleci/mysql:5.7
+      # specify the version you desire here
+      - image: circleci/openjdk:8-jdk
+
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/postgres:9.4
+    
+      - image: circleci/mysql:8.0.15
         command: [--default-authentication-plugin=mysql_native_password]
         environment:
-          #- MYSQL_ROOT_PASSWORD: password
+          - MYSQL_ROOT_PASSWORD: password
           - MYSQL_DATABASE: stocks
           - MYSQL_USER: monty
           - MYSQL_PASSWORD: some_pass
@@ -19,10 +29,30 @@ jobs:
       MAVEN_OPTS: -Xmx3200m
 
     steps:
-      - checkout # check out the code in the project directory
-      - run: echo "hello cruel world" # run the `echo` command
-      - run: mvn test -f pom.xml
-      - store_test_results:
-          path: target/surefire-reports
-      - store_artifacts:
-          path: target/my-reports
+      - checkout
+      - run: sudo apt install mysql-client
+      - run:
+          name: install dockerize
+          command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+          environment:
+            DOCKERIZE_VERSION: v0.3.0
+      - run:
+          name: Wait for db
+          command: dockerize -wait tcp://localhost:3306 -timeout 1m
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "pom.xml" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+
+      - run: mvn dependency:go-offline
+
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "pom.xml" }}
+
+      # run tests!
+      - run: mvn integration-test
