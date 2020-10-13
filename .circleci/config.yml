@@ -1,50 +1,39 @@
-# Java Maven CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-java/ for more details
-#
 version: 2
 jobs:
   build:
     docker:
-      # specify the version you desire here
-      - image: circleci/openjdk:8-jdk
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-    
-      - image: circleci/mysql:latest-ram
+      - image: circleci/php:7.1-apache-node-browsers # The primary container where steps are run
+        auth:
+          username: tpenney89
+          password: Greenmonster12  # context / project UI env-var reference
+      - image: circleci/mysql:8.0.4
+        auth:
+          username: tpenney89
+          password: Greenmonster12  # context / project UI env-var reference
         environment:
-          - MYSQL_ROOT_PASSWORD: some_pass
-          - MYSQL_DATABASE: stocks
-          - MYSQL_USER: monty
-          - MYSQL_PASSWORD: some_pass
-          
-    working_directory: ~/repo
-    
-    environment:
-      # Customize the JVM maximum heap limit
-      MAVEN_OPTS: -Xmx3200m
+          #MYSQL_ROOT_PASSWORD: rootpw
+          MYSQL_DATABASE: quotes
+          MYSQL_USER: monty
+          MYSQL_PASSWORD: some_pass
 
     steps:
       - checkout
-      - run: sudo apt-get update
-      - run: sudo apt-get install mysql-client
+      - run:
+      # Our primary container isn't MYSQL so run a sleep command until it's ready.
+          name: Waiting for MySQL to be ready
+          command: |
+            for i in `seq 1 10`;
+            do
+              nc -z 127.0.0.1 3306 && echo Success && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo Failed waiting for MySQL && exit 1
+      - run:
+          name: Install MySQL CLI
+          command: |
+            sudo apt-get install default-mysql-client
+      - run:
+          mvn test
 
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "pom.xml" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
 
-      - run: mvn dependency:go-offline
-
-      - save_cache:
-          paths:
-            - ~/.m2
-          key: v1-dependencies-{{ checksum "pom.xml" }}
-
-      # run tests!
-      - run: mvn integration-test
