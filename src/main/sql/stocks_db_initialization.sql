@@ -12,4 +12,9 @@ CREATE TABLE quotes(
 INSERT INTO quotes (symbol,time,price) VALUES ('GOOG','2004-08-19 00:00:01','85.00');
 INSERT INTO quotes (symbol,time,price) VALUES ('GOOG','2015-02-03 00:00:01','527.35');
 INSERT INTO quotes (symbol,time,price) VALUES ('APPL','2000-01-01 00:00:01','118.27');
-INSERT INTO quotes (symbol,time,price) VALUES ('AMZN','2015-02-03 00:00:01','363.21');
+INSERT INTO quotes (symbol,time,price) VALUES ('AMZN','2015-02-10 00:00:01','363.21');
+INSERT INTO quotes (symbol,time,price) VALUES ('AMZN','2015-02-10 00:01:01','363.21');
+INSERT INTO quotes (symbol,time,price) VALUES ('AMZN','2015-02-10 00:02:01','250.21');
+INSERT INTO quotes (symbol,time,price) VALUES ('AMZN','2015-02-10 00:03:01','251.21');
+INSERT INTO quotes (symbol,time,price) VALUES ('AMZN','2015-02-10 00:04:01','253.21');
+

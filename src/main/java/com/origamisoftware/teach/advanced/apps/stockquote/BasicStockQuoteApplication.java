@@ -4,7 +4,7 @@ import com.origamisoftware.teach.advanced.model.StockQuery;
 import com.origamisoftware.teach.advanced.model.StockQuote;
 import com.origamisoftware.teach.advanced.services.StockService;
 import com.origamisoftware.teach.advanced.services.StockServiceException;
-import com.origamisoftware.teach.advanced.services.StockServiceFactory;
+import com.origamisoftware.teach.advanced.services.ServiceFactory;
 
 import java.text.ParseException;
 import java.util.List;
@@ -16,7 +16,6 @@ public class BasicStockQuoteApplication {
 
     private StockService stockService;
 
-    // an example of how to use enum - not part of assignment 3 but useful for assignment 4
 
     /**
      * An enumeration that indicates how the program terminates (ends)
@@ -62,7 +61,7 @@ public class BasicStockQuoteApplication {
     }
 
     /**
-     * Given a <CODE>stockQuery</CODE> get back a the info about the stock to display to th user.
+     * Given a <CODE>stockQuery</CODE> get back a the info about the stock to display to the user.
      *
      * @param stockQuery the stock to get data for.
      * @return a String with the stock data in it.
@@ -118,14 +117,14 @@ public class BasicStockQuoteApplication {
         // be optimistic init to positive values
         ProgramTerminationStatusEnum exitStatus = ProgramTerminationStatusEnum.NORMAL;
         String programTerminationMessage = "Normal program termination.";
-        if (args.length != 3) {
+        if (args.length != 4) {
             exit(ProgramTerminationStatusEnum.ABNORMAL,
-                    "Please supply 3 arguments a stock symbol, a start date (MM/DD/YYYY) and end date (MM/DD/YYYY)");
+                    "Please supply 4 arguments a stock symbol, a start date (MM/DD/YYYY), an end date (MM/DD/YYYY), and an interval");
         }
         try {
 
-            StockQuery stockQuery = new StockQuery(args[0], args[1], args[2]);
-            StockService stockService = StockServiceFactory.getInstance();
+            StockQuery stockQuery = new StockQuery(args[0], args[1], args[2], args[3]);
+            StockService stockService = ServiceFactory.getStockServiceInstance();
             BasicStockQuoteApplication basicStockQuoteApplication =
                     new BasicStockQuoteApplication(stockService);
             basicStockQuoteApplication.displayStockQuotes(stockQuery);
